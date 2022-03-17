@@ -845,8 +845,10 @@ class Merger {
     const metadata = this.metadata(sourceIdx);
     const overrideDirective = metadata.isFed2Schema() ? metadata.overrideDirective() : undefined;
     const allFieldOverrides = overrideDirective ? field.appliedDirectivesOf(overrideDirective) : [];
-    const overrideOnField = allFieldOverrides.find(d => d.ofExtension() === field.ofExtension());
+    return allFieldOverrides.find(d => d.ofExtension() === field.ofExtension());
 
+    // TODO: commenting out since we don't support override on type just yet. Will be added back shortly
+    /*
     const type = field.parent;
     assert(type, 'Field must have a parent');
     const allTypeOverrides: Directive<any>[] = overrideDirective ? type.appliedDirectivesOf(overrideDirective) : [];
@@ -861,6 +863,7 @@ class Merger {
       return overrideOnField ?? overrideOnType; // only one of them is not undefined, but this will return the one we want
     }
     return undefined;
+    */
   }
 
   private overrideHasIncompatibleFields({
@@ -962,7 +965,7 @@ class Merger {
       return acc;
     }, { subgraphsWithOverride: [], subgraphMap: {} });
 
-    // for each subgraph that has an @override directive, check to see if
+    // for each subgraph that has an @override directive, check to see if any errors or hints should be surfaced
     subgraphsWithOverride.forEach((subgraphName) => {
       const { overrideDirective } = subgraphMap[subgraphName];
       const sourceSubgraphName = overrideDirective?.arguments()?.from;
